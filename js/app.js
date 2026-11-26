@@ -39,7 +39,7 @@ function filtrarPorCategoria(lista, categoria) {
 }
 
 function buscarPorTexto(lista, texto) {
-  const normalizar = valor => valor.toLocaleLowerCase('es').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');
+  const normalizar = valor => valor.toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const busqueda = normalizar(texto.trim());
   if (!busqueda) return [...lista];
   return lista.filter(item =>
