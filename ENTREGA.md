@@ -11,13 +11,13 @@ Sitio publicado: https://mariana874.github.io/evalucion2-maquetacion/
 
 ## Resultado del verificador
 
-Ejecutar en la carpeta del proyecto:
+Resultado de `node verificar-evaluacion.js --sin-api`:
 
-```bash
-node verificar-evaluacion.js --sin-api
 ```
-
-Pendiente: pegar aquí las dos últimas líneas del resultado obtenido al ejecutarlo localmente.
+Puntos automáticos: 51 de 54
+Nota automática:    4.25 de 4.5  (la sustentación vale 0.5)
+Las revisiones en línea [--] las hace el instructor con su copia del verificador.
+```
 
 ## Qué me faltó o qué haría distinto
 
