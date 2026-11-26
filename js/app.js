@@ -1,105 +1,99 @@
-/*
- * app.js - JavaScript que construye la interfaz
- *
- * Los NOMBRES de las funciones y sus parámetros no se cambian: el
- * verificador las llama así. Lo que hay dentro lo escribes tú.
- *
- * Las funciones de los issues #3 y #4 (crearCard, generarHTML, filtrar,
- * buscar, ordenar, aplicarFiltros) NO tocan el DOM: reciben datos y
- * devuelven datos o texto. Solo actualizarVista() e iniciar() usan document.
- *
- * Consulta:
- *   https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Template_literals
- *   https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Array/map
- *   https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
- *   https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
- *   https://developer.mozilla.org/es/docs/Web/API/EventTarget/addEventListener
- *   https://es.javascript.info/array-methods
- */
-
-// Estado de la interfaz: lo que la persona eligió en los controles.
+/* El catálogo se genera desde los datos de js/datos.js. */
 const estado = {
   categoria: 'todas',
   texto: '',
   orden: 'nombre-asc'
 };
 
-/* ---------------------------------------------------------------
- * Issue #3 - Datos a tarjetas
- * --------------------------------------------------------------- */
-
-// TODO: devuelve un TEXTO con el HTML de UNA tarjeta.
-// Debe tener: un article con clase card (dentro de una columna si tu
-// #catalogo no usa row-cols), la imagen con src = item.imagen y un alt
-// descriptivo, card-body, un h3 con clase card-title y el nombre,
-// un badge con la categoría, la descripción, el valor de
-// item[configuracion.campoOrden] con su etiqueta, y tus 2 campos propios.
 function crearCard(item) {
-
+  const categoriaNombre = {
+    futbol: 'Fútbol', natacion: 'Natación',
+    patinaje: 'Patinaje', baloncesto: 'Baloncesto'
+  };
+  const mensualidad = new Intl.NumberFormat('es-CO').format(item[configuracion.campoOrden]);
+  return `
+    <article class="card rounded-3 shadow-sm h-100">
+      <img class="card-img-top" src="${item.imagen}" alt="Imagen del programa ${item.nombre}" loading="lazy">
+      <div class="card-body d-flex flex-column">
+        <span class="badge badge-categoria align-self-start mb-2">${categoriaNombre[item.categoria] || item.categoria} (${item.categoria})</span>
+        <h3 class="card-title">${item.nombre}</h3>
+        <p class="card-text">${item.descripcion}</p>
+        <p class="precio mt-auto mb-2">${configuracion.etiquetaValor}: $ ${mensualidad} (${item[configuracion.campoOrden]})</p>
+        <p class="dato-tarjeta"><strong>Edad mínima:</strong> ${item.edadMinima} años</p>
+        <p class="dato-tarjeta"><strong>Horario:</strong> ${item.horario}</p>
+      </div>
+    </article>`;
 }
 
-// TODO: devuelve el HTML de TODAS las tarjetas de la lista (map + join).
-// Si la lista está vacía, devuelve un mensaje (por ejemplo un <p>) que
-// diga que no hay resultados.
 function generarHTML(lista) {
-
+  if (lista.length === 0) {
+    return '<p class="col-12 text-center py-4">No hay resultados para tu búsqueda.</p>';
+  }
+  return lista.map(crearCard).join('');
 }
 
-/* ---------------------------------------------------------------
- * Issue #4 - Filtrar, buscar y ordenar
- * Ninguna de estas funciones modifica la lista que recibe.
- * --------------------------------------------------------------- */
-
-// TODO: devuelve solo los elementos de esa categoría.
-// Si categoria es 'todas', devuelve todos.
 function filtrarPorCategoria(lista, categoria) {
-
+  return categoria === 'todas' ? [...lista] : lista.filter(item => item.categoria === categoria);
 }
 
-// TODO: devuelve los elementos cuyo nombre o descripcion contienen el
-// texto, sin importar mayúsculas ni espacios al inicio o al final.
-// Si el texto está vacío, devuelve todos.
 function buscarPorTexto(lista, texto) {
-
+  const busqueda = texto.trim().toLocaleLowerCase('es');
+  if (!busqueda) return [...lista];
+  return lista.filter(item =>
+    item.nombre.toLocaleLowerCase('es').includes(busqueda) ||
+    item.descripcion.toLocaleLowerCase('es').includes(busqueda)
+  );
 }
 
-// TODO: devuelve una COPIA ordenada según el criterio:
-//   'nombre-asc'  A a Z por nombre (localeCompare)
-//   'valor-asc'   de menor a mayor según item[configuracion.campoOrden]
-//   'valor-desc'  de mayor a menor
 function ordenarItems(lista, criterio) {
-
+  const resultado = [...lista];
+  if (criterio === 'valor-asc') {
+    resultado.sort((a, b) => a[configuracion.campoOrden] - b[configuracion.campoOrden]);
+  } else if (criterio === 'valor-desc') {
+    resultado.sort((a, b) => b[configuracion.campoOrden] - a[configuracion.campoOrden]);
+  } else {
+    resultado.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+  }
+  return resultado;
 }
 
-// TODO: aplica las tres funciones anteriores en cadena según el estado
-// ({ categoria, texto, orden }) y devuelve la lista resultante.
 function aplicarFiltros(lista, estadoActual) {
-
+  const porCategoria = filtrarPorCategoria(lista, estadoActual.categoria);
+  const porTexto = buscarPorTexto(porCategoria, estadoActual.texto);
+  return ordenarItems(porTexto, estadoActual.orden);
 }
 
-/* ---------------------------------------------------------------
- * Issue #4 - Eventos (estas sí usan el DOM)
- * --------------------------------------------------------------- */
-
-// TODO: calcula la lista con aplicarFiltros(items, estado), pinta el
-// resultado en #catalogo con innerHTML y actualiza #contador
-// (por ejemplo "Mostrando 5 de 12 resultados").
 function actualizarVista() {
-
+  const resultado = aplicarFiltros(items, estado);
+  document.getElementById('catalogo').innerHTML = generarHTML(resultado);
+  document.getElementById('contador').textContent =
+    `Mostrando ${resultado.length} de ${items.length} resultados`;
 }
 
-// TODO: conecta los eventos y pinta por primera vez.
-//   click  en cada botón con data-categoria: actualiza estado.categoria
-//          y aria-pressed ("true" en el elegido, "false" en los demás)
-//   input  en #buscador: actualiza estado.texto
-//   change en #orden: actualiza estado.orden
-// Después de cada cambio llama a actualizarVista().
 function iniciar() {
+  document.querySelectorAll('[data-categoria]').forEach(boton => {
+    boton.addEventListener('click', () => {
+      estado.categoria = boton.dataset.categoria;
+      document.querySelectorAll('[data-categoria]').forEach(otro => {
+        otro.setAttribute('aria-pressed', String(otro === boton));
+      });
+      actualizarVista();
+    });
+  });
 
+  document.getElementById('buscador').addEventListener('input', evento => {
+    estado.texto = evento.target.value;
+    actualizarVista();
+  });
+
+  document.getElementById('orden').addEventListener('change', evento => {
+    estado.orden = evento.target.value;
+    actualizarVista();
+  });
+
+  actualizarVista();
 }
 
-// No cambies estas líneas: así el archivo también carga en el verificador,
-// donde no existe document.
 if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', iniciar);
 }
