@@ -23,4 +23,4 @@ Las revisiones en línea [--] las hace el instructor con su copia del verificado
 
 La página tiene los 12 programas deportivos y los filtros de categoría, búsqueda y orden. Usé las imágenes de respaldo de la plantilla, que están permitidas por la guía. Como mejora, agregaría fotografías libres de los deportes y comprobaría el sitio en varios celulares.
 
-**Antes de entregar:** confirmar que GitHub Pages esté activado y que el enlace anterior abra correctamente.
+GitHub Pages activado y funcionamiento del enlace confirmado por la aprendiz.
