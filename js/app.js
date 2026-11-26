@@ -37,11 +37,12 @@ function filtrarPorCategoria(lista, categoria) {
 }
 
 function buscarPorTexto(lista, texto) {
-  const busqueda = texto.trim().toLocaleLowerCase('es');
+  const normalizar = valor => valor.toLocaleLowerCase('es').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');
+  const busqueda = normalizar(texto.trim());
   if (!busqueda) return [...lista];
   return lista.filter(item =>
-    item.nombre.toLocaleLowerCase('es').includes(busqueda) ||
-    item.descripcion.toLocaleLowerCase('es').includes(busqueda)
+    normalizar(item.nombre).includes(busqueda) ||
+    normalizar(item.descripcion).includes(busqueda)
   );
 }
 
