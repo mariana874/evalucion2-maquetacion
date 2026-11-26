@@ -12,6 +12,7 @@ function crearCard(item) {
   };
   const mensualidad = new Intl.NumberFormat('es-CO').format(item[configuracion.campoOrden]);
   return `
+    <div class="col">
     <article class="card rounded-3 shadow-sm h-100">
       <img class="card-img-top" src="${item.imagen}" alt="Imagen del programa ${item.nombre}" loading="lazy">
       <div class="card-body d-flex flex-column">
@@ -22,7 +23,8 @@ function crearCard(item) {
         <p class="dato-tarjeta"><strong>Edad mínima:</strong> ${item.edadMinima} años</p>
         <p class="dato-tarjeta"><strong>Horario:</strong> ${item.horario}</p>
       </div>
-    </article>`;
+    </article>
+    </div>`;
 }
 
 function generarHTML(lista) {
